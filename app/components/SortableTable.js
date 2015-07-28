@@ -1,6 +1,14 @@
 import React from 'react';
 import { Table } from 'react-bootstrap';
 
+class SortableHeader extends React.Component {
+  render () {
+    return (
+      <th><a onClick={this.props.onClick}>{this.props.title}</a></th>
+    );
+  }
+}
+
 class SortableTable extends React.Component {
   constructor(props) {
     super(props);
@@ -37,7 +45,7 @@ class SortableTable extends React.Component {
         <thead>
           <tr>
             <th>#</th>
-            <th><a onClick={this.handleClick}>First Name</a></th>
+            <SortableHeader title="First Name" onClick={this.handleClick} />
             <th>Last Name</th>
             <th>Birth Date</th>
           </tr>
