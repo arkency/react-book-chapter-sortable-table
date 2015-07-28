@@ -6,6 +6,8 @@ class SortableTable extends React.Component {
     super(props);
 
     this.state = { records: this.props.initialRecords };
+
+    this.handleClick = this.handleClick.bind(this);
   }
 
   createRow(record, index) {
@@ -19,6 +21,15 @@ class SortableTable extends React.Component {
     );
   }
 
+  handleClick(event) {
+    event.preventDefault();
+    let { records } = this.state;
+    records.sort(function(first, second){
+      return first.firstName.localeCompare(second.firstName);
+    });
+    this.setState({ records: records });
+  }
+
   render () {
     let {records} = this.state;
     return (
@@ -26,7 +37,7 @@ class SortableTable extends React.Component {
         <thead>
           <tr>
             <th>#</th>
-            <th>First Name</th>
+            <th><a onClick={this.handleClick}>First Name</a></th>
             <th>Last Name</th>
             <th>Birth Date</th>
           </tr>
