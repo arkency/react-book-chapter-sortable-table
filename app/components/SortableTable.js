@@ -5,17 +5,38 @@ class SortableHeader extends React.Component {
   constructor(props) {
     super(props);
 
+    this.state = { order: null };
+
     this.handleClick = this.handleClick.bind(this);
+    this.setOrder = this.setOrder.bind(this);
+  }
+
+  setOrder() {
+    let { order } = this.state;
+    if (order == null || order === "v") {
+      this.setState({ order: "^" });
+    }
+    else {
+      this.setState({ order: "v" });
+    }
   }
 
   handleClick(event) {
     event.preventDefault();
-    this.props.sort(this.props.attribute);
+    this.setOrder();
+    this.props.sort(this.props.attribute, this.state.order);
   }
 
   render () {
+    let indicator;
+    if (this.state.order) {
+      indicator = " " + this.state.order;
+    }
     return (
-      <th><a onClick={this.handleClick}>{this.props.title}</a></th>
+      <th>
+        <a onClick={this.handleClick}>{this.props.title}</a>
+        {indicator}
+      </th>
     );
   }
 }
@@ -40,11 +61,18 @@ class SortableTable extends React.Component {
     );
   }
 
-  sort(attribute) {
+  sort(attribute, order) {
     let { records } = this.state;
-    records.sort(function(first, second){
-      return first[attribute].localeCompare(second[attribute]);
-    });
+    if (order === "^") {
+      records.sort(function(first, second){
+        return second[attribute].localeCompare(first[attribute]);
+      });
+    }
+    else {
+      records.sort(function(first, second){
+        return first[attribute].localeCompare(second[attribute]);
+      });
+    }
     this.setState({ records: records });
   }
 
