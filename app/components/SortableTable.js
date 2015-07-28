@@ -2,9 +2,20 @@ import React from 'react';
 import { Table } from 'react-bootstrap';
 
 class SortableHeader extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.handleClick = this.handleClick.bind(this);
+  }
+
+  handleClick(event) {
+    event.preventDefault();
+    this.props.sort(this.props.attribute);
+  }
+
   render () {
     return (
-      <th><a onClick={this.props.onClick}>{this.props.title}</a></th>
+      <th><a onClick={this.handleClick}>{this.props.title}</a></th>
     );
   }
 }
@@ -15,7 +26,7 @@ class SortableTable extends React.Component {
 
     this.state = { records: this.props.initialRecords };
 
-    this.handleClick = this.handleClick.bind(this);
+    this.sort = this.sort.bind(this);
   }
 
   createRow(record, index) {
@@ -29,11 +40,10 @@ class SortableTable extends React.Component {
     );
   }
 
-  handleClick(event) {
-    event.preventDefault();
+  sort(attribute) {
     let { records } = this.state;
     records.sort(function(first, second){
-      return first.firstName.localeCompare(second.firstName);
+      return first[attribute].localeCompare(second[attribute]);
     });
     this.setState({ records: records });
   }
@@ -45,7 +55,7 @@ class SortableTable extends React.Component {
         <thead>
           <tr>
             <th>#</th>
-            <SortableHeader title="First Name" onClick={this.handleClick} />
+            <SortableHeader title="First Name" attribute="firstName" sort={this.sort} />
             <th>Last Name</th>
             <th>Birth Date</th>
           </tr>
