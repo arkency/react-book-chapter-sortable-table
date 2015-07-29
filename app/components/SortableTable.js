@@ -61,32 +61,45 @@ class SortableTable extends React.Component {
     );
   }
 
-  sort(attribute, order) {
-    let { records } = this.state;
-    records = records.map(function(record, index) {
-      return { key: record, position: index };
+  wrap(array) {
+    return array.map(function(item, index) {
+      return { key: item, position: index };
     });
+  }
+
+  unwrap(array) {
+    return array.map(function(item, index) {
+      return item.key;
+    });
+  }
+
+  getComparator(attribute, order) {
     if (order === "^") {
-      records.sort(function(first, second){
+      return function(first, second){
         let diff = second.key[attribute].localeCompare(first.key[attribute]);
         if (diff === 0) {
           return first.position - second.position;
         }
         return diff;
-      });
+      };
     }
     else {
-      records.sort(function(first, second){
+      return function(first, second){
         let diff = first.key[attribute].localeCompare(second.key[attribute]);
         if (diff === 0) {
           return first.position - second.position;
         }
         return diff;
-      });
+      };
     }
-    records = records.map(function(record, index) {
-      return record.key;
-    });
+  }
+
+  sort(attribute, order) {
+    let { records } = this.state;
+    let comparator = this.getComparator(attribute, order);
+    records = this.wrap(records);
+    records.sort(comparator);
+    records = this.unwrap(records);
     this.setState({ records: records });
   }
 
@@ -98,7 +111,7 @@ class SortableTable extends React.Component {
           <tr>
             <th>#</th>
             <SortableHeader title="First Name" attribute="firstName" sort={this.sort} />
-            <SortableHeader title="Last Name" attribute="lastName" sort={this.sort} />
+            <th>Last Name</th>
             <th>Birth Date</th>
           </tr>
         </thead>
