@@ -63,16 +63,30 @@ class SortableTable extends React.Component {
 
   sort(attribute, order) {
     let { records } = this.state;
+    records = records.map(function(record, index) {
+      return { key: record, position: index };
+    });
     if (order === "^") {
       records.sort(function(first, second){
-        return second[attribute].localeCompare(first[attribute]);
+        let diff = second.key[attribute].localeCompare(first.key[attribute]);
+        if (diff === 0) {
+          return first.position - second.position;
+        }
+        return diff;
       });
     }
     else {
       records.sort(function(first, second){
-        return first[attribute].localeCompare(second[attribute]);
+        let diff = first.key[attribute].localeCompare(second.key[attribute]);
+        if (diff === 0) {
+          return first.position - second.position;
+        }
+        return diff;
       });
     }
+    records = records.map(function(record, index) {
+      return record.key;
+    });
     this.setState({ records: records });
   }
 
@@ -84,7 +98,7 @@ class SortableTable extends React.Component {
           <tr>
             <th>#</th>
             <SortableHeader title="First Name" attribute="firstName" sort={this.sort} />
-            <th>Last Name</th>
+            <SortableHeader title="Last Name" attribute="lastName" sort={this.sort} />
             <th>Birth Date</th>
           </tr>
         </thead>
@@ -100,6 +114,7 @@ SortableTable.defaultProps = {
   initialRecords: [
       {firstName: "Angus", lastName: "Young", birthDate: "1955-03-31"},
       {firstName: "Malcolm", lastName: "Young", birthDate: "1953-01-06"},
+      {firstName: "George", lastName: "Young", birthDate: "1946-11-06"},
       {firstName: "Bon", lastName: "Scott", birthDate: "1946-07-09"},
       {firstName: "Phil", lastName: "Rudd", birthDate: "1954-05-19"},
       {firstName: "Cliff", lastName: "Williams", birthDate: "1949-12-14"}
