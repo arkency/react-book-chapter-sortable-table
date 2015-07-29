@@ -111,8 +111,8 @@ class SortableTable extends React.Component {
           <tr>
             <th>#</th>
             <SortableHeader title="First Name" attribute="firstName" sort={this.sort} />
-            <th>Last Name</th>
-            <th>Birth Date</th>
+            <SortableHeader title="Last Name" attribute="lastName" sort={this.sort} />
+            <SortableHeader title="Birth Date" attribute="birthDate" sort={this.sort} />
           </tr>
         </thead>
         <tbody>
