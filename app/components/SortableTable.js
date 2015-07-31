@@ -4,9 +4,7 @@ import { Table } from 'react-bootstrap';
 class SortableHeader extends React.Component {
   constructor(props) {
     super(props);
-
     this.state = { order: null };
-
     this.handleClick = this.handleClick.bind(this);
     this.setOrder = this.setOrder.bind(this);
   }
@@ -24,7 +22,7 @@ class SortableHeader extends React.Component {
   handleClick(event) {
     event.preventDefault();
     this.setOrder();
-    this.props.sort(this.props.attribute, this.state.order);
+    this.props.onClick(this.props.attribute, this.state.order);
   }
 
   render () {
@@ -44,21 +42,8 @@ class SortableHeader extends React.Component {
 class SortableTable extends React.Component {
   constructor(props) {
     super(props);
-
     this.state = { records: this.props.initialRecords };
-
     this.sort = this.sort.bind(this);
-  }
-
-  createRow(record, index) {
-    return (
-      <tr key={index}>
-        <th>{index + 1}</th>
-        <th>{record.firstName}</th>
-        <th>{record.lastName}</th>
-        <th>{record.birthDate}</th>
-      </tr>
-    );
   }
 
   wrap(array) {
@@ -95,7 +80,7 @@ class SortableTable extends React.Component {
   }
 
   sort(attribute, order) {
-    let { records } = this.state;
+    let { records } = Object.clone(this.state);
     let comparator = this.getComparator(attribute, order);
     records = this.wrap(records);
     records.sort(comparator);
@@ -110,15 +95,26 @@ class SortableTable extends React.Component {
         <thead>
           <tr>
             <th>#</th>
-            <SortableHeader title="First Name" attribute="firstName" sort={this.sort} />
-            <SortableHeader title="Last Name" attribute="lastName" sort={this.sort} />
-            <SortableHeader title="Birth Date" attribute="birthDate" sort={this.sort} />
+            <SortableHeader title="First Name" attribute="firstName" onClick={this.sort} />
+            <SortableHeader title="Last Name" attribute="lastName" onClick={this.sort} />
+            <SortableHeader title="Birth Date" attribute="birthDate" onClick={this.sort} />
           </tr>
         </thead>
         <tbody>
-          {records.map(this.createRow)}
+          {records.map(this.renderRow)}
         </tbody>
       </Table>
+    );
+  }
+
+  renderRow(record, index) {
+    return (
+      <tr key={index}>
+        <th>{index + 1}</th>
+        <th>{record.firstName}</th>
+        <th>{record.lastName}</th>
+        <th>{record.birthDate}</th>
+      </tr>
     );
   }
 }
