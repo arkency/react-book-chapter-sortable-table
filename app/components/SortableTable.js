@@ -1,11 +1,12 @@
 import React from 'react';
 import { Table } from 'react-bootstrap';
+import clone from 'clone';
 
 class SortableHeader extends React.Component {
   constructor(props) {
     super(props);
     this.state = { order: null };
-    this.handleClick = this.handleClick.bind(this);
+    this.handleHeaderClick = this.handleHeaderClick.bind(this);
     this.setOrder = this.setOrder.bind(this);
   }
 
@@ -19,7 +20,7 @@ class SortableHeader extends React.Component {
     }
   }
 
-  handleClick(event) {
+  handleHeaderClick(event) {
     event.preventDefault();
     this.setOrder();
     this.props.onClick(this.props.attribute, this.state.order);
@@ -32,7 +33,7 @@ class SortableHeader extends React.Component {
     }
     return (
       <th>
-        <a onClick={this.handleClick}>{this.props.title}</a>
+        <a onClick={this.handleHeaderClick}>{this.props.title}</a>
         {indicator}
       </th>
     );
@@ -60,19 +61,19 @@ class SortableTable extends React.Component {
 
   getComparator(attribute, order) {
     if (order === "^") {
-      return function(first, second){
-        let diff = second.key[attribute].localeCompare(first.key[attribute]);
+      return function(a, b){
+        let diff = b.key[attribute].localeCompare(a.key[attribute]);
         if (diff === 0) {
-          return first.position - second.position;
+          return a.position - b.position;
         }
         return diff;
       };
     }
     else {
-      return function(first, second){
-        let diff = first.key[attribute].localeCompare(second.key[attribute]);
+      return function(a, b){
+        let diff = a.key[attribute].localeCompare(b.key[attribute]);
         if (diff === 0) {
-          return first.position - second.position;
+          return a.position - b.position;
         }
         return diff;
       };
@@ -80,7 +81,7 @@ class SortableTable extends React.Component {
   }
 
   sort(attribute, order) {
-    let { records } = Object.clone(this.state);
+    let { records } = clone(this.state);
     let comparator = this.getComparator(attribute, order);
     records = this.wrap(records);
     records.sort(comparator);
