@@ -1,6 +1,6 @@
 import './styles.css';
 
-import '../node_modules/bootstrap/dist/css/bootstrap.css';
+import 'bootstrap/dist/css/bootstrap.css';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import SortableTable from './components/SortableTable';
