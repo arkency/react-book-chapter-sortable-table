@@ -1,65 +1,47 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Table } from 'react-bootstrap';
-import clone from 'clone';
 
-class SortableHeader extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = { order: null };
-    this.handleHeaderClick = this.handleHeaderClick.bind(this);
-    this.setOrder = this.setOrder.bind(this);
-  }
+function SortableHeader(props) {
+  const [order, updateOrder] = useState(null);
 
-  setOrder() {
-    let { order } = this.state;
+  const setOrder = () => {
     if (order == null || order === "v") {
-      this.setState({ order: "^" });
+      updateOrder("^");
     }
     else {
-      this.setState({ order: "v" });
+      updateOrder("v");
     }
   }
 
-  handleHeaderClick(event) {
+  const handleHeaderClick = event => {
     event.preventDefault();
-    this.setOrder();
-    this.props.onClick(this.props.attribute, this.state.order);
+    setOrder();
+    props.onClick(props.attribute, order);
   }
 
-  render () {
-    let indicator;
-    if (this.state.order) {
-      indicator = " " + this.state.order;
-    }
-    return (
-      <th>
-        <a onClick={this.handleHeaderClick}>{this.props.title}</a>
-        {indicator}
-      </th>
-    );
+  let indicator;
+  if (order) {
+    indicator = " " + order;
   }
+
+  return (
+    <th>
+      <a onClick={handleHeaderClick}>{props.title}</a>
+      {indicator}
+    </th>
+  );
 }
 
-class SortableTable extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = { records: this.props.initialRecords };
-    this.sort = this.sort.bind(this);
-  }
+function SortableTable(props) {
+  const [records, updateRecords] = useState(props.initialRecords);
 
-  wrap(array) {
-    return array.map(function(item, index) {
-      return { key: item, position: index };
-    });
-  }
+  const wrap = array => 
+    array.map((item, index) => ({ key: item, position: index }));
 
-  unwrap(array) {
-    return array.map(function(item, index) {
-      return item.key;
-    });
-  }
+  const unwrap = array =>
+    array.map(item => item.key);
 
-  getComparator(attribute, order) {
+  const getComparator = (attribute, order) => {
     if (order === "^") {
       return function(a, b){
         let diff = b.key[attribute].localeCompare(a.key[attribute]);
@@ -80,44 +62,38 @@ class SortableTable extends React.Component {
     }
   }
 
-  sort(attribute, order) {
-    let { records } = clone(this.state);
-    let comparator = this.getComparator(attribute, order);
-    records = this.wrap(records);
-    records.sort(comparator);
-    records = this.unwrap(records);
-    this.setState({ records: records });
+  const sort = (attribute, order) => {
+    const comparator = getComparator(attribute, order);
+    let sortedRecords = [...records]
+    sortedRecords = wrap(sortedRecords);
+    sortedRecords.sort(comparator);
+    sortedRecords = unwrap(sortedRecords);
+    updateRecords(sortedRecords);
   }
 
-  render () {
-    let {records} = this.state;
-    return (
-      <Table striped bordered condensed hover>
-        <thead>
-          <tr>
-            <th>#</th>
-            <SortableHeader title="First Name" attribute="firstName" onClick={this.sort} />
-            <SortableHeader title="Last Name" attribute="lastName" onClick={this.sort} />
-            <SortableHeader title="Birth Date" attribute="birthDate" onClick={this.sort} />
-          </tr>
-        </thead>
-        <tbody>
-          {records.map(this.renderRow)}
-        </tbody>
-      </Table>
-    );
-  }
+  const renderRow = (record, index) =>
+    <tr key={index}>
+      <th>{index + 1}</th>
+      <th>{record.firstName}</th>
+      <th>{record.lastName}</th>
+      <th>{record.birthDate}</th>
+    </tr>;
 
-  renderRow(record, index) {
-    return (
-      <tr key={index}>
-        <th>{index + 1}</th>
-        <th>{record.firstName}</th>
-        <th>{record.lastName}</th>
-        <th>{record.birthDate}</th>
-      </tr>
-    );
-  }
+  return (
+    <Table striped bordered condensed hover>
+      <thead>
+        <tr>
+          <th>#</th>
+          <SortableHeader title="First Name" attribute="firstName" onClick={sort} />
+          <SortableHeader title="Last Name" attribute="lastName" onClick={sort} />
+          <SortableHeader title="Birth Date" attribute="birthDate" onClick={sort} />
+        </tr>
+      </thead>
+      <tbody>
+        {records.map(renderRow)}
+      </tbody>
+    </Table>
+  );
 }
 
 SortableTable.defaultProps = {
